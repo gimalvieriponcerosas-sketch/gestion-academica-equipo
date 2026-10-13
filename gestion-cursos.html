@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cursos</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 30px 15px;
+            color: #1e293b;
+        }
+
+        .contenedor {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1d4ed8;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        .formulario {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        input,
+        select {
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 11px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            background: #2563eb;
+        }
+
+        .registrar {
+            grid-column: 1 / -1;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #eff6ff;
+        }
+
+        .eliminar {
+            background: #dc2626;
+        }
+
+        .editar {
+            background: #0f766e;
+            margin-right: 5px;
+        }
+
+        .acciones {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            .formulario {
+                grid-template-columns: 1fr;
+            }
+
+            .registrar {
+                grid-column: auto;
+            }
+
+            body {
+                padding: 15px 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="contenedor">
+        <h1>Gestión de Cursos</h1>
+        <p>Registra, consulta y administra los cursos académicos.</p>
+
+        <section class="panel">
+            <h2 id="tituloFormulario">Registrar curso</h2>
+
+            <form id="formularioCursos" class="formulario">
+                <div class="campo">
+                    <label for="codigo">Código del curso</label>
+                    <input id="codigo" required maxlength="20" placeholder="Ej. CUR001">
+                </div>
+
+                <div class="campo">
+                    <label for="nombre">Nombre del curso</label>
+                    <input id="nombre" required maxlength="100" placeholder="Ej. Programación Web">
+                </div>
+
+                <div class="campo">
+                    <label for="creditos">Créditos</label>
+                    <input id="creditos" type="number" min="1" max="30" required placeholder="Ej. 4">
+                </div>
+
+                <div class="campo">
+                    <label for="estado">Estado</label>
+                    <select id="estado" required>
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <button class="registrar" type="submit" id="botonGuardar">
+                    Registrar curso
+                </button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>Lista de cursos</h2>
+
+            <div class="campo">
+                <label for="busqueda">Buscar curso</label>
+                <input id="busqueda" placeholder="Buscar por código o nombre...">
+            </div>
+
+            <p id="totalCursos">Total de cursos: 0</p>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Créditos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaCursos"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const formulario = document.getElementById("formularioCursos");
+        const lista = document.getElementById("listaCursos");
+        const busqueda = document.getElementById("busqueda");
+
+        // Datos de demostración guardados en este navegador.
+        let cursos = JSON.parse(
+            localStorage.getItem("gestionCursos") || "[]"
+        );
+
+        let indiceEdicion = null;
+
+        function guardarDatos() {
+            localStorage.setItem("gestionCursos", JSON.stringify(cursos));
+        }
+
+        function crearCelda(valor) {
+            const celda = document.createElement("td");
+            celda.textContent = valor;
+            return celda;
+        }
+
+        function mostrarCursos() {
+            lista.replaceChildren();
+
+            const texto = busqueda.value.toLowerCase().trim();
+
+            const filtrados = cursos
+                .map((curso, indice) => ({curso, indice}))
+                .filter(({curso}) =>
+                    curso.codigo.toLowerCase().includes(texto) ||
+                    curso.nombre.toLowerCase().includes(texto)
+                );
+
+            document.getElementById("totalCursos").textContent =
+                `Total de cursos: ${cursos.length}`;
+
+            filtrados.forEach(({curso, indice}) => {
+                const fila = document.createElement("tr");
+
+                fila.append(
+                    crearCelda(curso.codigo),
+                    crearCelda(curso.nombre),
+                    crearCelda(curso.creditos),
+                    crearCelda(curso.estado)
+                );
+
+                const acciones = document.createElement("td");
+                acciones.className = "acciones";
+
+                const editar = document.createElement("button");
+                editar.type = "button";
+                editar.className = "editar";
+                editar.textContent = "Editar";
+                editar.addEventListener("click", () => editarCurso(indice));
+
+                const eliminar = document.createElement("button");
+                eliminar.type = "button";
+                eliminar.className = "eliminar";
+                eliminar.textContent = "Eliminar";
+                eliminar.addEventListener("click", () => eliminarCurso(indice));
+
+                acciones.append(editar, eliminar);
+                fila.appendChild(acciones);
+                lista.appendChild(fila);
+            });
+        }
+
+        formulario.addEventListener("submit", function (evento) {
+            evento.preventDefault();
+
+            const curso = {
+                codigo: document.getElementById("codigo").value.trim(),
+                nombre: document.getElementById("nombre").value.trim(),
+                creditos: Number(document.getElementById("creditos").value),
+                estado: document.getElementById("estado").value
+            };
+
+            const codigoDuplicado = cursos.some((existente, indice) =>
+                existente.codigo.toLowerCase() === curso.codigo.toLowerCase() &&
+                indice !== indiceEdicion
+            );
+
+            if (codigoDuplicado) {
+                alert("Ya existe un curso con ese código.");
+                return;
+            }
+
+            if (indiceEdicion === null) {
+                cursos.push(curso);
+            } else {
+                cursos[indiceEdicion] = curso;
+            }
+
+            guardarDatos();
+            formulario.reset();
+            indiceEdicion = null;
+
+            document.getElementById("tituloFormulario").textContent =
+                "Registrar curso";
+            document.getElementById("botonGuardar").textContent =
+                "Registrar curso";
+
+            mostrarCursos();
+        });
+
+        function editarCurso(indice) {
+            const curso = cursos[indice];
+
+            document.getElementById("codigo").value = curso.codigo;
+            document.getElementById("nombre").value = curso.nombre;
+            document.getElementById("creditos").value = curso.creditos;
+            document.getElementById("estado").value = curso.estado;
+
+            indiceEdicion = indice;
+
+            document.getElementById("tituloFormulario").textContent =
+                "Editar curso";
+            document.getElementById("botonGuardar").textContent =
+                "Guardar cambios";
+
+            window.scrollTo({top: 0, behavior: "smooth"});
+        }
+
+        function eliminarCurso(indice) {
+            if (!confirm("¿Deseas eliminar este curso?")) return;
+
+            cursos.splice(indice, 1);
+            guardarDatos();
+            mostrarCursos();
+        }
+
+        busqueda.addEventListener("input", mostrarCursos);
+
+        mostrarCursos();
+    </script>
+</body>
+
+</html>
