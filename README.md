@@ -8,7 +8,7 @@ Sistema de gestión académica para administrar información de estudiantes y su
 - Integrante 2: Pholsing Hugo Rubio Poma
 - Integrante 3: Luis Angel Ursua Espiritu
 - Integrante 4: Jhosep Daniel Rubin Fonseca
-- Integrante 5: Jherry Suñiga Mazgo
+- Integrante 5: Jerry Suñiga Masgo
 
 
 ## Requisitos
