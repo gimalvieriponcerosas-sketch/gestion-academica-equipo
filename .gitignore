@@ -1,0 +1,16 @@
+# Dependencias
+node_modules/
+
+# Entorno y credenciales (Seguridad obligatoria)
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+
+# Archivos del sistema y temporales
+dist/
+build/
+*.log
+.DS_Store
+Thumbs.db

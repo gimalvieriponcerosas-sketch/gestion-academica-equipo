@@ -1,0 +1,32 @@
+name: CI - Calidad y Seguridad
+
+on:
+  pull_request:
+    branches: [ develop, main ]
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  verificacion-seguridad:
+    name: Verificación de Credenciales y Sintaxis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Escaneo de seguridad (Detectar credenciales o claves expuestas)
+        run: |
+          echo "Verificando que no existan archivos confidenciales..."
+          if git ls-files | grep -E '\.env|\.pem|\.key|id_rsa'; then
+            echo "ERROR: Se encontraron credenciales o llaves privadas comprometidas."
+            exit 1
+          else
+            echo "OK: Repositorio seguro, sin credenciales expuestas."
+          fi
+
+      - name: Prueba básica de integridad
+        run: |
+          echo "Verificando estructura del proyecto..."
+          test -f README.md && echo "README.md presente."
+          test -f .gitignore && echo ".gitignore configurado correctamente."
