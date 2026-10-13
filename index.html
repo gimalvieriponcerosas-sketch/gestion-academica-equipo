@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión Académica | Estudiantes</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <main class="contenedor">
+    <header>
+      <h1>Gestión Académica</h1>
+      <p>Sistema de registro de estudiantes</p>
+    </header>
+
+    <section class="panel">
+      <h2>Registrar estudiante</h2>
+
+      <form id="formEstudiante">
+        <div class="campo">
+          <label for="codigo">Código estudiantil</label>
+          <input id="codigo" type="text" required maxlength="20"
+                 placeholder="Ej. EST001">
+        </div>
+
+        <div class="campo">
+          <label for="nombres">Nombres</label>
+          <input id="nombres" type="text" required maxlength="80"
+                 placeholder="Ingrese los nombres">
+        </div>
+
+        <div class="campo">
+          <label for="apellidos">Apellidos</label>
+          <input id="apellidos" type="text" required maxlength="80"
+                 placeholder="Ingrese los apellidos">
+        </div>
+
+        <div class="campo">
+          <label for="correo">Correo electrónico</label>
+          <input id="correo" type="email" required maxlength="120"
+                 placeholder="estudiante@ejemplo.com">
+        </div>
+
+        <button type="submit">Registrar estudiante</button>
+        <p id="mensaje" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Listado de estudiantes</h2>
+
+      <label for="buscar">Buscar por código o nombre</label>
+      <input id="buscar" type="search"
+             placeholder="Escribe para buscar...">
+
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Correo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="listaEstudiantes"></tbody>
+        </table>
+      </div>
+
+      <p id="total">Total de estudiantes: 0</p>
+    </section>
+  </main>
+
+  <script src="js/estudiantes.js"></script>
+</body>
+</html>
